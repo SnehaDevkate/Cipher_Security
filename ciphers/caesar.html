@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.webp">
+
+    <title>Caesar Cipher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #3b82f6;
+            --accent-primary-hover: #2563eb;
+            --accent-secondary: #10b981;
+            --accent-secondary-hover: #059669;
+            --accent-danger: #ef4444;
+            --accent-danger-hover: #dc2626;
+            --border-color: #334155;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --input-bg: #0f172a;
+            --result-bg: #1e293b;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            /* text-fill-color: transparent; */
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .cipher-container {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        textarea,
+        input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        textarea {
+            min-height: 150px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--accent-secondary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-danger {
+            background-color: var(--accent-danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--accent-danger-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: var(--result-bg);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-primary);
+            transition: all 0.3s ease;
+        }
+
+        .result p {
+            line-height: 1.6;
+            word-break: break-all;
+        }
+
+        .result p strong {
+            color: var(--accent-primary);
+        }
+
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 25px;
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .home-link:hover {
+            color: var(--accent-primary-hover);
+            transform: translateX(-5px);
+        }
+
+        .home-link:before {
+            content: "←";
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Caesar Cipher</h1>
+        <p class="subtitle">Encrypt or decrypt messages by shifting letters in the alphabet</p>
+    </header>
+
+    <div class="cipher-container">
+        <div class="form-group">
+            <label for="message">Enter your message:</label>
+            <textarea id="message" placeholder="Type your message here..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="shift">Shift value (1-25):</label>
+            <input type="number" id="shift" min="1" max="25" value="3">
+        </div>
+
+        <div class="btn-group">
+            <button id="encrypt" class="btn btn-primary">Encrypt</button>
+            <button id="decrypt" class="btn btn-secondary">Decrypt</button>
+            <button id="clear" class="btn btn-danger">Clear</button>
+        </div>
+
+        <div class="result" id="result">
+            <p>Result will appear here...</p>
+        </div>
+
+        <a href="/index.html" class="home-link">Back to Home</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const messageInput = document.getElementById('message');
+            const shiftInput = document.getElementById('shift');
+            const encryptBtn = document.getElementById('encrypt');
+            const decryptBtn = document.getElementById('decrypt');
+            const clearBtn = document.getElementById('clear');
+            const resultDiv = document.getElementById('result');
+
+            function caesarCipher(text, shift, encrypt = true) {
+                // If decrypting, use negative shift
+                if (!encrypt) {
+                    shift = (26 - shift) % 26;
+                }
+
+                return text.split('').map(char => {
+                    // Check if character is a letter
+                    if (/[a-zA-Z]/.test(char)) {
+                        // Determine ASCII offset based on case
+                        const offset = char.charCodeAt(0) <= 90 ? 65 : 97;
+                        // Apply shift and wrap around alphabet
+                        return String.fromCharCode((char.charCodeAt(0) - offset + shift) % 26 + offset);
+                    }
+                    // Return non-alphabetic characters unchanged
+                    return char;
+                }).join('');
+            }
+
+            encryptBtn.addEventListener('click', function () {
+                const message = messageInput.value;
+                const shift = parseInt(shiftInput.value);
+
+                if (!message) {
+                    resultDiv.innerHTML = '<p>Please enter a message to encrypt.</p>';
+                    return;
+                }
+
+                if (isNaN(shift) || shift < 1 || shift > 25) {
+                    resultDiv.innerHTML = '<p>Please enter a valid shift value between 1 and 25.</p>';
+                    return;
+                }
+
+                const encrypted = caesarCipher(message, shift, true);
+                resultDiv.innerHTML = `
+                    <p><strong>Encrypted Message:</strong></p>
+                    <p>${encrypted}</p>
+                `;
+
+                // Add animation effect
+                resultDiv.style.opacity = '0';
+                setTimeout(() => {
+                    resultDiv.style.opacity = '1';
+                }, 50);
+            });
+
+            decryptBtn.addEventListener('click', function () {
+                const message = messageInput.value;
+                const shift = parseInt(shiftInput.value);
+
+                if (!message) {
+                    resultDiv.innerHTML = '<p>Please enter a message to decrypt.</p>';
+                    return;
+                }
+
+                if (isNaN(shift) || shift < 1 || shift > 25) {
+                    resultDiv.innerHTML = '<p>Please enter a valid shift value between 1 and 25.</p>';
+                    return;
+                }
+
+                const decrypted = caesarCipher(message, shift, false);
+                resultDiv.innerHTML = `
+                    <p><strong>Decrypted Message:</strong></p>
+                    <p>${decrypted}</p>
+                `;
+
+                // Add animation effect
+                resultDiv.style.opacity = '0';
+                setTimeout(() => {
+                    resultDiv.style.opacity = '1';
+                }, 50);
+            });
+
+            clearBtn.addEventListener('click', function () {
+                messageInput.value = '';
+                shiftInput.value = '3';
+                resultDiv.innerHTML = '<p>Result will appear here...</p>';
+            });
+        });
+    </script>
+</body>
+
+</html>

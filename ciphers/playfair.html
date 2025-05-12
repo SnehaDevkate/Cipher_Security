@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.webp">
+
+    <title>Playfair Cipher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #3b82f6;
+            --accent-primary-hover: #2563eb;
+            --accent-secondary: #10b981;
+            --accent-secondary-hover: #059669;
+            --accent-danger: #ef4444;
+            --accent-danger-hover: #dc2626;
+            --border-color: #334155;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --input-bg: #0f172a;
+            --result-bg: #1e293b;
+            --matrix-bg: #0f172a;
+            --matrix-border: #334155;
+            --matrix-text: #f8fafc;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            /* text-fill-color: transparent; */
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .cipher-container {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        textarea,
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        textarea:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--accent-secondary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-danger {
+            background-color: var(--accent-danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--accent-danger-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: var(--result-bg);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-primary);
+            transition: all 0.3s ease;
+        }
+
+        .result p {
+            line-height: 1.6;
+            word-break: break-all;
+        }
+
+        .result p strong {
+            color: var(--accent-primary);
+        }
+
+        .matrix-container {
+            margin: 30px 0;
+            background-color: var(--bg-card);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .matrix-container h3 {
+            margin-bottom: 15px;
+            color: var(--accent-primary);
+            text-align: center;
+        }
+
+        .matrix {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+
+        .matrix-cell {
+            background-color: var(--matrix-bg);
+            border: 1px solid var(--matrix-border);
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 6px;
+            color: var(--matrix-text);
+            transition: all 0.3s ease;
+        }
+
+        .matrix-cell:hover {
+            background-color: var(--accent-primary);
+            transform: scale(1.05);
+        }
+
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 25px;
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .home-link:hover {
+            color: var(--accent-primary-hover);
+            transform: translateX(-5px);
+        }
+
+        .home-link:before {
+            content: "←";
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Playfair Cipher</h1>
+        <p class="subtitle">Encrypt or decrypt messages using a 5x5 key table</p>
+    </header>
+
+    <div class="cipher-container">
+        <div class="form-group">
+            <label for="key">Enter your key:</label>
+            <input type="text" id="key" placeholder="Enter a keyword (e.g., MONARCHY)">
+        </div>
+
+        <div class="form-group">
+            <label for="message">Enter your message:</label>
+            <textarea id="message" placeholder="Type your message here..."></textarea>
+        </div>
+
+        <div class="btn-group">
+            <button id="generate-matrix" class="btn btn-primary">Generate Key Matrix</button>
+            <button id="encrypt" class="btn btn-primary">Encrypt</button>
+            <button id="decrypt" class="btn btn-secondary">Decrypt</button>
+            <button id="clear" class="btn btn-danger">Clear</button>
+        </div>
+
+        <div class="matrix-container">
+            <h3>Key Matrix</h3>
+            <div class="matrix" id="matrix"></div>
+        </div>
+
+        <div class="result" id="result">
+            <p>Result will appear here...</p>
+        </div>
+
+        <a href="/index.html" class="home-link">Back to Home</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const keyInput = document.getElementById('key');
+            const messageInput = document.getElementById('message');
+            const generateMatrixBtn = document.getElementById('generate-matrix');
+            const encryptBtn = document.getElementById('encrypt');
+            const decryptBtn = document.getElementById('decrypt');
+            const clearBtn = document.getElementById('clear');
+            const matrixDiv = document.getElementById('matrix');
+            const resultDiv = document.getElementById('result');
+
+            let keyMatrix = [];
+
+            function generateKeyMatrix(key) {
+                // Convert key to uppercase and remove non-alphabetic characters
+                key = key.toUpperCase().replace(/[^A-Z]/g, '');
+
+                // Replace J with I
+                key = key.replace(/J/g, 'I');
+
+                // Create alphabet (without J)
+                const alphabet = 'ABCDEFGHIKLMNOPQRSTUVWXYZ';
+
+                // Create a set to track used characters
+                const usedChars = new Set();
+
+                // Add key characters to the matrix first
+                let matrixChars = [];
+                for (let char of key) {
+                    if (!usedChars.has(char)) {
+                        usedChars.add(char);
+                        matrixChars.push(char);
+                    }
+                }
+
+                // Add remaining alphabet characters
+                for (let char of alphabet) {
+                    if (!usedChars.has(char)) {
+                        usedChars.add(char);
+                        matrixChars.push(char);
+                    }
+                }
+
+                // Create 5x5 matrix
+                keyMatrix = [];
+                for (let i = 0; i < 5; i++) {
+                    keyMatrix.push(matrixChars.slice(i * 5, (i + 1) * 5));
+                }
+
+                return keyMatrix;
+            }
+
+            function displayMatrix(matrix) {
+                matrixDiv.innerHTML = '';
+
+                for (let row of matrix) {
+                    for (let cell of row) {
+                        const cellDiv = document.createElement('div');
+                        cellDiv.className = 'matrix-cell';
+                        cellDiv.textContent = cell;
+                        matrixDiv.appendChild(cellDiv);
+                    }
+                }
+            }
+
+            function findPosition(matrix, char) {
+                for (let i = 0; i < 5; i++) {
+                    for (let j = 0; j < 5; j++) {
+                        if (matrix[i][j] === char) {
+                            return [i, j];
+                        }
+                    }
+                }
+                return null;
+            }
+
+            function prepareText(text) {
+                // Convert to uppercase and remove non-alphabetic characters
+                text = text.toUpperCase().replace(/[^A-Z]/g, '');
+
+                // Replace J with I
+                text = text.replace(/J/g, 'I');
+
+                // Split into digraphs
+                let result = '';
+                for (let i = 0; i < text.length; i++) {
+                    result += text[i];
+
+                    // If we're at the end of the text or the next character is the same,
+                    // insert an 'X' (unless the current character is also 'X', then use 'Q')
+                    if (i + 1 < text.length) {
+                        if (text[i] === text[i + 1]) {
+                            result += (text[i] === 'X' ? 'Q' : 'X');
+                        }
+                    }
+                }
+
+                // If the length is odd, add an 'X' at the end
+                if (result.length % 2 !== 0) {
+                    result += 'X';
+                }
+
+                return result;
+            }
+
+            function playfairEncrypt(text, matrix) {
+                text = prepareText(text);
+                let result = '';
+
+                for (let i = 0; i < text.length; i += 2) {
+                    const char1 = text[i];
+                    const char2 = text[i + 1];
+
+                    const [row1, col1] = findPosition(matrix, char1);
+                    const [row2, col2] = findPosition(matrix, char2);
+
+                    let newChar1, newChar2;
+
+                    if (row1 === row2) {
+                        // Same row - take characters to the right (with wraparound)
+                        newChar1 = matrix[row1][(col1 + 1) % 5];
+                        newChar2 = matrix[row2][(col2 + 1) % 5];
+                    } else if (col1 === col2) {
+                        // Same column - take characters below (with wraparound)
+                        newChar1 = matrix[(row1 + 1) % 5][col1];
+                        newChar2 = matrix[(row2 + 1) % 5][col2];
+                    } else {
+                        // Rectangle - take characters at the other corners
+                        newChar1 = matrix[row1][col2];
+                        newChar2 = matrix[row2][col1];
+                    }
+
+                    result += newChar1 + newChar2;
+                }
+
+                return result;
+            }
+
+            function playfairDecrypt(text, matrix) {
+                text = text.toUpperCase().replace(/[^A-Z]/g, '');
+                let result = '';
+
+                for (let i = 0; i < text.length; i += 2) {
+                    const char1 = text[i];
+                    const char2 = text[i + 1];
+
+                    const [row1, col1] = findPosition(matrix, char1);
+                    const [row2, col2] = findPosition(matrix, char2);
+
+                    let newChar1, newChar2;
+
+                    if (row1 === row2) {
+                        // Same row - take characters to the left (with wraparound)
+                        newChar1 = matrix[row1][(col1 - 1 + 5) % 5];
+                        newChar2 = matrix[row2][(col2 - 1 + 5) % 5];
+                    } else if (col1 === col2) {
+                        // Same column - take characters above (with wraparound)
+                        newChar1 = matrix[(row1 - 1 + 5) % 5][col1];
+                        newChar2 = matrix[(row2 - 1 + 5) % 5][col2];
+                    } else {
+                        // Rectangle - take characters at the other corners
+                        newChar1 = matrix[row1][col2];
+                        newChar2 = matrix[row2][col1];
+                    }
+
+                    result += newChar1 + newChar2;
+                }
+
+                return result;
+            }
+
+            generateMatrixBtn.addEventListener('click', function () {
+                const key = keyInput.value;
+
+                if (!key) {
+                    resultDiv.innerHTML = '<p>Please enter a key.</p>';
+                    return;
+                }
+
+                const matrix = generateKeyMatrix(key);
+                displayMatrix(matrix);
+
+                resultDiv.innerHTML = '<p>Key matrix generated successfully!</p>';
+
+                // Add animation effect
+                matrixDiv.style.opacity = '0';
+                setTimeout(() => {
+                    matrixDiv.style.opacity = '1';
+                }, 50);
+            });
+
+            encryptBtn.addEventListener('click', function () {
+                const key = keyInput.value;
+                const message = messageInput.value;
+
+                if (!key || !message) {
+                    resultDiv.innerHTML = '<p>Please enter both a key and a message.</p>';
+                    return;
+                }
+
+                if (keyMatrix.length === 0) {
+                    keyMatrix = generateKeyMatrix(key);
+                    displayMatrix(keyMatrix);
+                }
+
+                const encrypted = playfairEncrypt(message, keyMatrix);
+
+                resultDiv.innerHTML = `
+                    <p><strong>Encrypted Message:</strong></p>
+                    <p>${encrypted}</p>
+                    <p><strong>Formatted in pairs:</strong></p>
+                    <p>${encrypted.match(/.{1,2}/g).join(' ')}</p>
+                `;
+
+                // Add animation effect
+                resultDiv.style.opacity = '0';
+                setTimeout(() => {
+                    resultDiv.style.opacity = '1';
+                }, 50);
+            });
+
+            decryptBtn.addEventListener('click', function () {
+                const key = keyInput.value;
+                const message = messageInput.value;
+
+                if (!key || !message) {
+                    resultDiv.innerHTML = '<p>Please enter both a key and a message.</p>';
+                    return;
+                }
+
+                if (keyMatrix.length === 0) {
+                    keyMatrix = generateKeyMatrix(key);
+                    displayMatrix(keyMatrix);
+                }
+
+                const decrypted = playfairDecrypt(message, keyMatrix);
+
+                resultDiv.innerHTML = `
+                    <p><strong>Decrypted Message:</strong></p>
+                    <p>${decrypted}</p>
+                `;
+
+                // Add animation effect
+                resultDiv.style.opacity = '0';
+                setTimeout(() => {
+                    resultDiv.style.opacity = '1';
+                }, 50);
+            });
+
+            clearBtn.addEventListener('click', function () {
+                keyInput.value = '';
+                messageInput.value = '';
+                matrixDiv.innerHTML = '';
+                keyMatrix = [];
+                resultDiv.innerHTML = '<p>Result will appear here...</p>';
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.webp">
+
+    <title>Hill Cipher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #3b82f6;
+            --accent-primary-hover: #2563eb;
+            --accent-secondary: #10b981;
+            --accent-secondary-hover: #059669;
+            --accent-danger: #ef4444;
+            --accent-danger-hover: #dc2626;
+            --border-color: #334155;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --input-bg: #0f172a;
+            --result-bg: #1e293b;
+            --matrix-bg: #0f172a;
+            --matrix-border: #334155;
+            --matrix-text: #f8fafc;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            /* text-fill-color: transparent; */
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .cipher-container {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        textarea,
+        input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        textarea:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        .matrix-input {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .matrix-input input {
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .matrix-input input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--accent-secondary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-danger {
+            background-color: var(--accent-danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--accent-danger-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: var(--result-bg);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-primary);
+            transition: all 0.3s ease;
+        }
+
+        .result p {
+            line-height: 1.6;
+            word-break: break-all;
+        }
+
+        .result p strong {
+            color: var(--accent-primary);
+        }
+
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 25px;
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .home-link:hover {
+            color: var(--accent-primary-hover);
+            transform: translateX(-5px);
+        }
+
+        .home-link:before {
+            content: "←";
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Hill Cipher</h1>
+        <p class="subtitle">Encrypt or decrypt messages using a 2x2 matrix</p>
+    </header>
+
+    <div class="cipher-container">
+        <div class="form-group">
+            <label>Enter your 2x2 key matrix:</label>
+            <div class="matrix-input">
+                <input type="number" id="k00" placeholder="Key[0,0]" value="5">
+                <input type="number" id="k01" placeholder="Key[0,1]" value="8">
+                <input type="number" id="k10" placeholder="Key[1,0]" value="17">
+                <input type="number" id="k11" placeholder="Key[1,1]" value="3">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="message">Enter your message:</label>
+            <textarea id="message" placeholder="Type your message here..."></textarea>
+        </div>
+
+        <div class="btn-group">
+            <button id="encrypt" class="btn btn-primary">Encrypt</button>
+            <button id="decrypt" class="btn btn-secondary">Decrypt</button>
+            <button id="clear" class="btn btn-danger">Clear</button>
+        </div>
+
+        <div class="result" id="result">
+            <p>Result will appear here...</p>
+        </div>
+
+        <a href="/index.html" class="home-link">Back to Home</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const k00Input = document.getElementById('k00');
+            const k01Input = document.getElementById('k01');
+            const k10Input = document.getElementById('k10');
+            const k11Input = document.getElementById('k11');
+            const messageInput = document.getElementById('message');
+            const encryptBtn = document.getElementById('encrypt');
+            const decryptBtn = document.getElementById('decrypt');
+            const clearBtn = document.getElementById('clear');
+            const resultDiv = document.getElementById('result');
+
+            // Function to convert letter to number (A=0, B=1, ..., Z=25)
+            function letterToNumber(letter) {
+                return letter.toUpperCase().charCodeAt(0) - 65;
+            }
+
+            // Function to convert number to letter (0=A, 1=B, ..., 25=Z)
+            function numberToLetter(number) {
+                return String.fromCharCode((number % 26) + 65);
+            }
+
+            // Function to calculate determinant of 2x2 matrix
+            function determinant(matrix) {
+                return (matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]) % 26;
+            }
+
+            // Function to calculate modular multiplicative inverse
+            function modInverse(a, m) {
+                a = ((a % m) + m) % m; // Ensure a is positive
+                for (let x = 1; x < m; x++) {
+                    if ((a * x) % m === 1) {
+                        return x;
+                    }
+                }
+                return 1; // Default if no inverse exists
+            }
+
+            // Function to calculate inverse of 2x2 matrix
+            function inverseMatrix(matrix) {
+                const det = determinant(matrix);
+                const detInv = modInverse(det, 26);
+
+                // Adjugate matrix
+                const adj = [
+                    [matrix[1][1], (-matrix[0][1] + 26) % 26],
+                    [(-matrix[1][0] + 26) % 26, matrix[0][0]]
+                ];
+
+                // Multiply adjugate by determinant inverse
+                return [
+                    [(adj[0][0] * detInv) % 26, (adj[0][1] * detInv) % 26],
+                    [(adj[1][0] * detInv) % 26, (adj[1][1] * detInv) % 26]
+                ];
+            }
+
+            // Function to prepare text (remove non-alphabetic characters, convert to uppercase)
+            function prepareText(text) {
+                text = text.toUpperCase().replace(/[^A-Z]/g, '');
+
+                // If the length is odd, add an 'X' at the end
+                if (text.length % 2 !== 0) {
+                    text += 'X';
+                }
+
+                return text;
+            }
+
+            // Function to encrypt using Hill cipher
+            function hillEncrypt(text, keyMatrix) {
+                text = prepareText(text);
+                let result = '';
+
+                for (let i = 0; i < text.length; i += 2) {
+                    const char1 = letterToNumber(text[i]);
+                    const char2 = letterToNumber(text[i + 1]);
+
+                    const newChar1 = (keyMatrix[0][0] * char1 + keyMatrix[0][1] * char2) % 26;
+                    const newChar2 = (keyMatrix[1][0] * char1 + keyMatrix[1][1] * char2) % 26;
+
+                    result += numberToLetter(newChar1) + numberToLetter(newChar2);
+                }
+
+                return result;
+            }
+
+            // Function to decrypt using Hill cipher
+            function hillDecrypt(text, keyMatrix) {
+                text = prepareText(text);
+
+                // Calculate inverse of key matrix
+                const invKeyMatrix = inverseMatrix(keyMatrix);
+
+                let result = '';
+
+                for (let i = 0; i < text.length; i += 2) {
+                    const char1 = letterToNumber(text[i]);
+                    const char2 = letterToNumber(text[i + 1]);
+
+                    let newChar1 = (invKeyMatrix[0][0] * char1 + invKeyMatrix[0][1] * char2) % 26;
+                    let newChar2 = (invKeyMatrix[1][0] * char1 + invKeyMatrix[1][1] * char2) % 26;
+
+                    // Ensure positive values
+                    newChar1 = (newChar1 + 26) % 26;
+                    newChar2 = (newChar2 + 26) % 26;
+
+                    result += numberToLetter(newChar1) + numberToLetter(newChar2);
+                }
+
+                return result;
+            }
+
+            encryptBtn.addEventListener('click', function () {
+                const message = messageInput.value;
+
+                if (!message) {
+                    resultDiv.innerHTML = '<p>Please enter a message to encrypt.</p>';
+                    return;
+                }
+
+                // Get key matrix values
+                const keyMatrix = [
+                    [parseInt(k00Input.value) % 26, parseInt(k01Input.value) % 26],
+                    [parseInt(k10Input.value) % 26, parseInt(k11Input.value) % 26]
+                ];
+
+                // Check if determinant is coprime with 26
+                const det = determinant(keyMatrix);
+                if (det === 0 || gcd(det, 26) !== 1) {
+                    resultDiv.innerHTML = '<p>Invalid key matrix. The determinant must be coprime with 26.</p>';
+                    return;
+                }
+
+                const encrypted = hillEncrypt(message, keyMatrix);
+
+                resultDiv.innerHTML = `
+                    <p><strong>Encrypted Message:</strong></p>
+                    <p>${encrypted}</p>
+                `;
+
+                // Add animation effect
+                resultDiv.style.opacity = '0';
+                setTimeout(() => {
+                    resultDiv.style.opacity = '1';
+                }, 50);
+            });
+
+            decryptBtn.addEventListener('click', function () {
+                const message = messageInput.value;
+
+                if (!message) {
+                    resultDiv.innerHTML = '<p>Please enter a message to decrypt.</p>';
+                    return;
+                }
+
+                // Get key matrix values
+                const keyMatrix = [
+                    [parseInt(k00Input.value) % 26, parseInt(k01Input.value) % 26],
+                    [parseInt(k10Input.value) % 26, parseInt(k11Input.value) % 26]
+                ];
+
+                // Check if determinant is coprime with 26
+                const det = determinant(keyMatrix);
+                if (det === 0 || gcd(det, 26) !== 1) {
+                    resultDiv.innerHTML = '<p>Invalid key matrix. The determinant must be coprime with 26.</p>';
+                    return;
+                }
+
+                const decrypted = hillDecrypt(message, keyMatrix);
+
+                resultDiv.innerHTML = `
+                    <p><strong>Decrypted Message:</strong></p>
+                    <p>${decrypted}</p>
+                `;
+
+                // Add animation effect
+                resultDiv.style.opacity = '0';
+                setTimeout(() => {
+                    resultDiv.style.opacity = '1';
+                }, 50);
+            });
+
+            clearBtn.addEventListener('click', function () {
+                messageInput.value = '';
+                k00Input.value = '5';
+                k01Input.value = '8';
+                k10Input.value = '17';
+                k11Input.value = '3';
+                resultDiv.innerHTML = '<p>Result will appear here...</p>';
+            });
+
+            // Function to calculate greatest common divisor (GCD)
+            function gcd(a, b) {
+                if (b === 0) return a;
+                return gcd(b, a % b);
+            }
+        });
+    </script>
+</body>
+
+</html>

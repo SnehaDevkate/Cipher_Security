@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.webp">
+    <title>Cipher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #3b82f6;
+            --accent-primary-hover: #2563eb;
+            --accent-secondary: #10b981;
+            --accent-secondary-hover: #059669;
+            --accent-danger: #ef4444;
+            --accent-danger-hover: #dc2626;
+            --border-color: #334155;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            width: 100%;
+            max-width: 1000px;
+            padding: 30px;
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            /* text-fill-color: transparent; */
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .cipher-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .cipher-card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .cipher-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            background-color: var(--bg-card-hover);
+            border-color: var(--accent-primary);
+        }
+
+        .cipher-card h2 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .cipher-card p {
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            flex-grow: 1;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--accent-primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 20px;
+            width: 100%;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .cipher-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--accent-primary);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Cipher Encryption/Decryption</h1>
+        <p class="subtitle">Secure your messages with powerful encryption algorithms</p>
+    </header>
+
+    <div class="cipher-container">
+        <div class="cipher-card">
+            <div class="cipher-icon">🔄</div>
+            <h2>Caesar Cipher</h2>
+            <p>A classic substitution cipher where each letter is shifted by a fixed number of positions in the
+                alphabet.</p>
+            <a href="/ciphers/caesar.html" class="btn">Select</a>
+        </div>
+
+        <div class="cipher-card">
+            <div class="cipher-icon">🔢</div>
+            <h2>Playfair Cipher</h2>
+            <p>A manual symmetric encryption technique that uses a 5×5 table of letters constructed using a keyword.</p>
+            <a href="/ciphers/playfair.html" class="btn">Select</a>
+        </div>
+
+        <div class="cipher-card">
+            <div class="cipher-icon">📊</div>
+            <h2>Hill Cipher</h2>
+            <p>A polygraphic substitution cipher based on linear algebra, using matrices to transform blocks of
+                plaintext.</p>
+            <a href="/ciphers/hill.html" class="btn">Select</a>
+        </div>
+
+        <div class="cipher-card">
+            <div class="cipher-icon">🧮</div>
+            <h2>Affine Cipher</h2>
+            <p>A monoalphabetic substitution cipher that combines mathematical functions with modular arithmetic.</p>
+            <a href="/ciphers/affine.html" class="btn">Select</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Cipher Tools | Modern Encryption Techniques</p>
+    </footer>
+</body>
+
+</html>
